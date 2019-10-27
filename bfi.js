@@ -266,6 +266,9 @@ onmessage = function(e) {
     case 'restart':
       instance.restart(e.data.interval);
       break;
+    case 'step':
+      instance.step();
+      break;
     default:
       throw "Unknown command: " + e.data.command;
   }

@@ -95,7 +95,9 @@ let vm = new Vue({
       this.program_status = 'running';
     },
     step: function(e) {
-      throw "Not implemented step";
+      this.worker.postMessage({
+        command: 'step'
+      });
     },
     stepout: function(e) {
       throw "Not implemented stepout";
