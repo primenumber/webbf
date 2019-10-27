@@ -1,12 +1,41 @@
 "use strict";
 
+function encodeWithMode(data, mode, decoder) {
+  switch (mode) {
+    case 'raw':
+      return decoder.decode(data, {stream: true});
+    case 'hex':
+      return ('00' + data.toString(16)).slice(-2);
+    default:
+      throw "Unknown encode mode: " + mode;
+  }
+}
+
+function decodeWithMode(string, mode) {
+  switch (mode) {
+    case 'raw':
+      return (new TextEncoder).encode(string);
+    case 'hex':
+      const len = string.length / 2;
+      let res = new Uint8Array(len);
+      for (let i = 0; i < len; ++i) {
+        res[i] = parseInt(string.substring(i*2, 2), 16);
+      }
+      return res;
+    default:
+      throw "Unknown decode mode: " + mode;
+  }
+}
+
 let vm = new Vue({
   el: '#app',
   data: {
     sourcecode: '',
-    stdin_data: '',
-    stdout_data: '',
-    stderr_data: '',
+    stdout_decoder: new TextDecoder(),
+    stderr_decoder: new TextDecoder(),
+    stdin_string: '',
+    stdout_string: '',
+    stderr_string: '',
     debug_mode: 'simple',
     stdin_mode: 'raw',
     stdout_mode: 'raw',
@@ -33,10 +62,17 @@ let vm = new Vue({
     },
     is_breaking: function() {
       return this.program_status == 'breaking';
+    },
+    stdin_data: function() {
+      return decodeWithMode(this.stdin_string, this.stdin_mode);
     }
   },
   methods: {
     start: function(e) {
+      this.stdout_decoder = new TextDecoder;
+      this.stderr_decoder = new TextDecoder;
+      this.stdout_string = '';
+      this.stderr_string = '';
       let data = {
         command: 'start',
         mode: this.debug_mode,
@@ -49,8 +85,7 @@ let vm = new Vue({
       this.worker.onmessage = function(e) {
         switch (e.data.type) {
           case 'finished':
-            vm.stdout_data = (new TextDecoder).decode(e.data.stdout);
-            vm.stderr_data = (new TextDecoder).decode(e.data.stderr);
+            vm.stdout_string = encodeWithMode(e.data.stdout, vm.stdout_mode, vm.stdout_decoder);
             vm.program_status = 'not_started';
             break;
           case 'step':
@@ -58,10 +93,12 @@ let vm = new Vue({
             vm.data_ptr = e.data.data_ptr;
             break;
           case 'stdout':
-            vm.stdout_data += String.fromCharCode(e.data.data);
+            let stdout = new Uint8Array([e.data.data]);
+            vm.stdout_string += encodeWithMode(stdout, vm.stdout_mode, vm.stdout_decoder);
             break;
           case 'stderr':
-            vm.stderr_data += String.fromCharCode(e.data.data);
+            let stderr = new Uint8Array([e.data.data]);
+            vm.stderr_string += encodeWithMode(stderr, vm.stderr_mode, vm.stderr_decoder);
             break;
           case 'break':
             vm.program_status = 'breaking';

@@ -1,5 +1,7 @@
 "use strict";
 
+self.importScripts('vector.js');
+
 class BFInterpreterBase {
   constructor(source, eof) {
     this._source = source;
@@ -38,24 +40,23 @@ class OptimizedBFInterpreter extends BFInterpreterBase {
     }
   }
   run(input) {
-    let data = new Uint8Array(65536);
+    let data = new Uint8Vector(65536);
     let data_ptr = 0;
     let prog_ptr = 0;
-    const input_bytes = (new TextEncoder).encode(input);
     let input_ptr = 0;
     let output_data = [];
     while (prog_ptr < this._source.length) {
       switch (this._source[prog_ptr]) {
         case '+':
-          data[data_ptr] += 1;
+          data.at(data_ptr) += 1;
           break;
         case '-':
-          data[data_ptr] -= 1;
+          data.at(data_ptr) -= 1;
           break;
         case '>':
           data_ptr += 1;
           if (data_ptr >= data.length) {
-            throw "Out of range";
+            data.push(0);
           }
           break;
         case '<':
@@ -65,25 +66,25 @@ class OptimizedBFInterpreter extends BFInterpreterBase {
           }
           break;
         case '[':
-          if (data[data_ptr] == 0) {
+          if (data.at(data_ptr) == 0) {
             prog_ptr = this.jumpmap.get(prog_ptr);
           }
           break;
         case ']':
-          if (data[data_ptr] != 0) {
+          if (data.at(data_ptr) != 0) {
             prog_ptr = this.jumpmap.get(prog_ptr);
           }
           break;
         case ',':
-          if (input_ptr < input_bytes.length) {
-            data[data_ptr] = input_bytes[input_ptr];
+          if (input_ptr < input.length) {
+            data.set_at(data_ptr, input[input_ptr]);
             input_ptr += 1;
           } else {
-            data[data_ptr] = this._eof;
+            data.set_at(data_ptr, this._eof);
           }
           break;
         case '.':
-          output_data.push(data[data_ptr]);
+          output_data.push(data.at(data_ptr));
           break;
         default:;
       }
@@ -136,10 +137,10 @@ class SimplBFDebbuger extends BFInterpreterBase {
     return Uint8Array.from(this._stderr_data);
   }
   run(input, interval) {
-    this._data = new Uint8Array(65536);
+    this._data = new Uint8Vector(65536);
     this._data_ptr = 0;
     this._prog_ptr = 0;
-    this.input_bytes = (new TextEncoder).encode(input);
+    this.input = input;
     this.input_ptr = 0;
     this._stdout_data = [];
     this._stderr_data = [];
@@ -165,15 +166,15 @@ class SimplBFDebbuger extends BFInterpreterBase {
     });
     switch (this._source[this.prog_ptr]) {
       case '+':
-        this._data[this._data_ptr] += 1;
+        this._data.set_at(this._data_ptr, this._data.at(this._data_ptr) + 1);
         break;
       case '-':
-        this._data[this._data_ptr] -= 1;
+        this._data.set_at(this._data_ptr, this._data.at(this._data_ptr) - 1);
         break;
       case '>':
         this._data_ptr += 1;
         if (this._data_ptr >= this._data.length) {
-          throw "Out of range";
+          this._data.push(0);
         }
         break;
       case '<':
@@ -183,35 +184,35 @@ class SimplBFDebbuger extends BFInterpreterBase {
         }
         break;
       case '[':
-        if (this._data[this._data_ptr] == 0) {
+        if (this._data.at(this._data_ptr) == 0) {
           this._prog_ptr = this.jumpmap.get(this._prog_ptr);
         }
         break;
       case ']':
-        if (this._data[this._data_ptr] != 0) {
+        if (this._data.at(this._data_ptr) != 0) {
           this._prog_ptr = this.jumpmap.get(this._prog_ptr);
         }
         break;
       case ',':
-        if (this.input_ptr < this.input_bytes.length) {
-          this._data[this._data_ptr] = this.input_bytes[this.input_ptr];
+        if (this.input_ptr < this.input.length) {
+          this._data.set_at(this._data_ptr, this.input[this.input_ptr]);
           this.input_ptr += 1;
         } else {
-          this._data[this._data_ptr] = this._eof;
+          this._data.set_at(this._data_ptr, this._eof);
         }
         break;
       case '.':
-        this._stdout_data.push(this._data[this._data_ptr]);
+        this._stdout_data.push(this._data.at(this._data_ptr));
         postMessage({
           type: 'stdout',
-          data: this._data[this._data_ptr]
+          data: this._data.at(this._data_ptr)
         });
         break;
       case ':':
-        this._stderr_data.push(this._data[this._data_ptr]);
+        this._stderr_data.push(this._data.at(this._data_ptr));
         postMessage({
           type: 'stderr',
-          data: this._data[this._data_ptr]
+          data: this._data.at(this._data_ptr)
         });
         break;
       case '@':

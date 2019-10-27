@@ -15,7 +15,7 @@
         <br>
         <label for="stdin">標準入力</label>
         <br>
-        <textarea class="normaltextarea" id="stdin" rows="12" v-model="stdin_data"></textarea>
+        <textarea class="normaltextarea" id="stdin" rows="12" v-model="stdin_string"></textarea>
         <br>
         デバッグモード
         <input type="radio" id="debug_disable" value="disable" v-bind:disable="is_running" v-model="debug_mode">
@@ -60,10 +60,10 @@
       </div>
       <div class="right">
         <label for="stdout">標準出力</label>
-        <textarea class="normaltextarea" id="stdout" v-model="stdout_data" rows="12" disabled></textarea>
+        <textarea class="normaltextarea" id="stdout" v-model="stdout_string" rows="12" disabled></textarea>
         <br>
         <label for="stderr">標準エラー出力</label>
-        <textarea class="normaltextarea" id="stderr" v-model="stderr_data" rows="12" disabled></textarea>
+        <textarea class="normaltextarea" id="stderr" v-model="stderr_string" rows="12" disabled></textarea>
         <p>プログラムカウンタ: {{ prog_ptr }}</p>
         <p>データポインタ: {{ data_ptr }}</p>
       </div>
