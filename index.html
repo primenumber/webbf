@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Online Brainf*ck debugger</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  </head>
+  <body>
+    <div class="container" id="app">
+      <div class="left">
+        <label for="code">ソースコード</label>
+        <br>
+        <textarea class="normaltextarea" id="code" v-model="sourcecode" rows="18" placeholder="+[>,.<]"></textarea>
+        <br>
+        <label for="stdin">標準入力</label>
+        <br>
+        <textarea class="normaltextarea" id="stdin" rows="12" v-model="stdin_data"></textarea>
+        <br>
+        デバッグモード
+        <input type="radio" id="debug_disable" value="disable" v-bind:disable="is_running" v-model="debug_mode">
+        <label for="debug_disable">無効</label>
+        <input type="radio" id="debug_simple" value="simple" checked v-bind:disable="is_running" v-model="debug_mode">
+        <label for="debug_simple">シンプル</label>
+        <input type="radio" id="debug_logging" value="logging" v-bind:disable="is_running" v-model="debug_mode">
+        <label for="debug_logging">ログ保存</label>
+        <br>
+        標準入力フォーマット
+        <input type="radio" id="stdin_raw" value="raw" checked v-model="stdin_mode">
+        <label for="stdin_raw">UTF-8文字列</label>
+        <input type="radio" id="stdin_hex" value="hex" v-model="stdin_mode">
+        <label for="stdin_hex">16進数</label>
+        <input type="radio" id="stdin_base64" value="base64" v-model="stdin_mode">
+        <label for="stdin_base64">Base64</label>
+        <br>
+        標準出力フォーマット
+        <input type="radio" id="stdout_raw" value="raw" checked v-model="stdout_mode">
+        <label for="stdout_raw">UTF-8文字列</label>
+        <input type="radio" id="stdout_hex" value="hex" v-model="stdout_mode">
+        <label for="stdout_hex">16進数</label>
+        <input type="radio" id="stdout_base64" value="base64" v-model="stdout_mode">
+        <label for="stdout_base64">Base64</label>
+        <br>
+        標準エラー出力フォーマット
+        <input type="radio" id="stderr_raw" value="raw" checked v-bind:disabled="!enable_debug" v-model="stderr_mode">
+        <label for="stderr_raw">UTF-8文字列</label>
+        <input type="radio" id="stderr_hex" value="hex" v-bind:disabled="!enable_debug" v-model="stderr_mode">
+        <label for="stderr_hex">16進数</label>
+        <input type="radio" id="stderr_base64" value="base64" v-bind:disabled="!enable_debug" v-model="stderr_mode">
+        <label for="stderr_base64">Base64</label>
+        <br>
+        EOF(入力終端)記号
+        <input type="radio" id="zero" checked v-model="eof" v-bind:value="0">
+        <label for="zero">0</label>
+        <input type="radio" id="negone" v-model="eof" v-bind:value="-1">
+        <label for="negone">-1</label>
+        <br>
+        <label for="interval">1ステップの実行時間</label>
+        <input type="number" id="interval" min="10" required v-bind:disabled="!enable_debug" v-model="interval">
+        <br>
+        <button v-bind:disabled="is_running" v-on:click="start">開始</button>
+        <button v-bind:disabled="!is_running" v-on:click="stop">停止</button>
+        <button v-bind:disabled="!is_breaking" v-on:click="restart">再開</button>
+        <button v-bind:disabled="!is_breaking" v-on:click="step">ステップ実行</button>
+        <button v-bind:disabled="!is_breaking" v-on:click="stepout">ループ脱出</button>
+      </div>
+      <div class="right">
+        <label for="stdout">標準出力</label>
+        <textarea class="normaltextarea" id="stdout" v-model="stdout_data" rows="12" disabled></textarea>
+        <br>
+        <label for="stderr">標準エラー出力</label>
+        <textarea class="normaltextarea" id="stderr" v-model="stderr_data" rows="12" disabled></textarea>
+        <p>プログラムカウンタ: {{ prog_ptr }}</p>
+        <p>データポインタ: {{ data_ptr }}</p>
+      </div>
+    </div>
+    <script src="main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+.container {
+  display: flex;
+}
+.left {
+  flex: 0.5;
+}
+.right {
+  flex: 0.5;
+}
+.normaltextarea {
+  resize: vertical;
+  width: 95%;
+}
