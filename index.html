@@ -30,24 +30,18 @@
         <label for="stdin_raw">UTF-8文字列</label>
         <input type="radio" id="stdin_hex" value="hex" v-model="stdin_mode">
         <label for="stdin_hex">16進数</label>
-        <input type="radio" id="stdin_base64" value="base64" v-model="stdin_mode">
-        <label for="stdin_base64">Base64</label>
         <br>
         標準出力フォーマット
         <input type="radio" id="stdout_raw" value="raw" checked v-model="stdout_mode">
         <label for="stdout_raw">UTF-8文字列</label>
         <input type="radio" id="stdout_hex" value="hex" v-model="stdout_mode">
         <label for="stdout_hex">16進数</label>
-        <input type="radio" id="stdout_base64" value="base64" v-model="stdout_mode">
-        <label for="stdout_base64">Base64</label>
         <br>
         標準エラー出力フォーマット
         <input type="radio" id="stderr_raw" value="raw" checked v-bind:disabled="!enable_debug" v-model="stderr_mode">
         <label for="stderr_raw">UTF-8文字列</label>
         <input type="radio" id="stderr_hex" value="hex" v-bind:disabled="!enable_debug" v-model="stderr_mode">
         <label for="stderr_hex">16進数</label>
-        <input type="radio" id="stderr_base64" value="base64" v-bind:disabled="!enable_debug" v-model="stderr_mode">
-        <label for="stderr_base64">Base64</label>
         <br>
         EOF(入力終端)記号
         <input type="radio" id="zero" checked v-model="eof" v-bind:value="0">
