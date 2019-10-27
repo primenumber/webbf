@@ -19,7 +19,7 @@ function decodeWithMode(string, mode) {
       const len = string.length / 2;
       let res = new Uint8Array(len);
       for (let i = 0; i < len; ++i) {
-        res[i] = parseInt(string.substring(i*2, 2), 16);
+        res[i] = parseInt(string.substring(i*2, i*2 + 2), 16);
       }
       return res;
     default:
