@@ -5,7 +5,7 @@ function encodeWithMode(data, mode, decoder) {
     case 'raw':
       return decoder.decode(data, {stream: true});
     case 'hex':
-      return ('00' + data.toString(16)).slice(-2);
+      return Array.prototype.map.call(data, x => ('00' + x.toString(16)).slice(-2)).join('');
     default:
       throw "Unknown encode mode: " + mode;
   }
