@@ -63,6 +63,9 @@ let vm = new Vue({
           case 'stderr':
             vm.stderr_data += String.fromCharCode(e.data.data);
             break;
+          case 'break':
+            vm.program_status = 'breaking';
+            break;
           default:
             throw "Unknown type: " + e.data.type;
         }
