@@ -48,10 +48,10 @@ class OptimizedBFInterpreter extends BFInterpreterBase {
     while (prog_ptr < this._source.length) {
       switch (this._source[prog_ptr]) {
         case '+':
-          data.at(data_ptr) += 1;
+          data.set_at(data_ptr, data.at(data_ptr) + 1);
           break;
         case '-':
-          data.at(data_ptr) -= 1;
+          data.set_at(data_ptr, data.at(data_ptr) - 1);
           break;
         case '>':
           data_ptr += 1;
