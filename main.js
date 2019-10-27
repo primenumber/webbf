@@ -85,7 +85,9 @@ let vm = new Vue({
       this.worker.onmessage = function(e) {
         switch (e.data.type) {
           case 'finished':
-            vm.stdout_string = encodeWithMode(e.data.stdout, vm.stdout_mode, vm.stdout_decoder);
+            if (vm.debug_mode == 'disable') {
+              vm.stdout_string = encodeWithMode(e.data.stdout, vm.stdout_mode, vm.stdout_decoder);
+            }
             vm.program_status = 'not_started';
             break;
           case 'step':
