@@ -193,8 +193,8 @@ class SimplBFDebbuger extends BFInterpreterBase {
         }
         break;
       case ',':
-        if (this.input_ptr < this._input_bytes.length) {
-          data[data_ptr] = this._input_bytes[this.input_ptr];
+        if (this.input_ptr < this.input_bytes.length) {
+          data[data_ptr] = this.input_bytes[this.input_ptr];
           this.input_ptr += 1;
         } else {
           this._data[this._data_ptr] = this._eof;
