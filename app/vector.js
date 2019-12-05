@@ -42,4 +42,7 @@ class Uint8Vector {
     let offset = this.data.byteOffset;
     return new DataView(buffer, offset, this._length);
   }
+  get toArray() {
+    return Uint8Array.from(this.data, x => x);
+  }
 }

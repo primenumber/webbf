@@ -5,6 +5,7 @@
     <title>Online Brainf*ck debugger</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="vector.js"></script>
   </head>
   <body>
     <div class="container" id="app">
@@ -52,6 +53,11 @@
         <label for="interval">1ステップの実行時間</label>
         <input type="number" id="interval" min="10" required v-bind:disabled="!enable_debug" v-model="interval">
         <br>
+        <label for="begin">メモリ表示開始アドレス</label>
+        <input type="number" min="0" v-bind:max="memrange.end" id="begin" v-model="memrange.begin">
+        <label for="end">メモリ表示終了アドレス</label>
+        <input type="number" v-bind:min="memrange.begin" id="end" v-model="memrange.end">
+        <br>
         <button v-bind:disabled="is_running" v-on:click="start">開始</button>
         <button v-bind:disabled="!is_running" v-on:click="stop">停止</button>
         <button v-bind:disabled="!is_breaking" v-on:click="restart">再開</button>
@@ -64,6 +70,9 @@
         <br>
         <label for="stderr">標準エラー出力</label>
         <textarea class="normaltextarea" id="stderr" v-model="stderr_string" rows="12" disabled></textarea>
+        <div class="memview">
+          <div v-for="cell in memview">{{ to_hex(cell) }},</div>
+        </div>
         <p>プログラムカウンタ: {{ prog_ptr }}</p>
         <p>データポインタ: {{ data_ptr }}</p>
       </div>

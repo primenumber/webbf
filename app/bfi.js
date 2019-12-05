@@ -162,7 +162,7 @@ class SimplBFDebbuger extends BFInterpreterBase {
       type: 'step',
       prog_ptr: this._prog_ptr,
       data_ptr: this._data_ptr,
-      data: this._data
+      data: this._data.toArray
     });
     switch (this._source[this.prog_ptr]) {
       case '+':

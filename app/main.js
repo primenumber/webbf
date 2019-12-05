@@ -1,11 +1,15 @@
 "use strict";
 
+let to_hex = function(x) {
+  return ('00' + x.toString(16)).slice(-2);
+}
+
 function encodeWithMode(data, mode, decoder) {
   switch (mode) {
     case 'raw':
       return decoder.decode(data, {stream: true});
     case 'hex':
-      return Array.prototype.map.call(data, x => ('00' + x.toString(16)).slice(-2)).join('');
+      return Array.prototype.map.call(data, to_hex).join('');
     default:
       throw "Unknown encode mode: " + mode;
   }
@@ -31,6 +35,7 @@ let vm = new Vue({
   el: '#app',
   data: {
     sourcecode: '',
+    data: null,
     stdout_decoder: new TextDecoder(),
     stderr_decoder: new TextDecoder(),
     stdin_string: '',
@@ -45,7 +50,11 @@ let vm = new Vue({
     worker: new Worker('bfi.js'),
     program_status: 'not_started',
     prog_ptr: 0,
-    data_ptr: 0
+    data_ptr: 0,
+    memrange: {
+      begin: 0,
+      end: 16
+    }
   },
   computed: {
     enable_debug: function() {
@@ -65,6 +74,24 @@ let vm = new Vue({
     },
     stdin_data: function() {
       return decodeWithMode(this.stdin_string, this.stdin_mode);
+    },
+    memview: function() {
+      if (!this.enable_debug) {
+        return [];
+      }
+      if (this.data === null) {
+        return [];
+      }
+      const begin = Math.max(this.memrange.begin, 0);
+      const end = Math.min(this.memrange.end, this.data.length);
+      if (begin >= end) {
+        return [];
+      }
+      let res = [];
+      for (let i = begin; i != end; i++) {
+        res.push(this.data[i]);
+      }
+      return res;
     }
   },
   methods: {
@@ -93,6 +120,7 @@ let vm = new Vue({
           case 'step':
             vm.prog_ptr = e.data.prog_ptr;
             vm.data_ptr = e.data.data_ptr;
+            vm.data = e.data.data;
             break;
           case 'stdout':
             let stdout = new Uint8Array([e.data.data]);
@@ -141,5 +169,8 @@ let vm = new Vue({
     stepout: function(e) {
       throw "Not implemented stepout";
     },
+    to_hex: function(x) {
+      return to_hex(x)
+    }
   }
 })

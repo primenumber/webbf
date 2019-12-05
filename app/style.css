@@ -11,3 +11,7 @@
   resize: vertical;
   width: 95%;
 }
+.memview {
+  display: flex;
+  flex-wrap: wrap;
+}
