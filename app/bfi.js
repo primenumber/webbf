@@ -117,7 +117,7 @@ class SimplBFDebbuger extends BFInterpreterBase {
     if (stack.length > 0) {
       throw "Unmatched brackets";
     }
-    this._data = new Uint8Array(65536);
+    this._data = new Uint8Vector(1024);
     this._data_ptr = 0;
     this._prog_ptr = 0;
   }
@@ -137,7 +137,7 @@ class SimplBFDebbuger extends BFInterpreterBase {
     return Uint8Array.from(this._stderr_data);
   }
   run(input, interval) {
-    this._data = new Uint8Vector(65536);
+    this._data = new Uint8Vector(1024);
     this._data_ptr = 0;
     this._prog_ptr = 0;
     this.input = input;
