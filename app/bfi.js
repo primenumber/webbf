@@ -43,6 +43,7 @@ class OptimizedBFInterpreter extends BFInterpreterBase {
     let data = new Uint8Vector(65536);
     let data_ptr = 0;
     let prog_ptr = 0;
+    let cycle_count = 0;
     let input_ptr = 0;
     let output_data = [];
     while (prog_ptr < this._source.length) {
@@ -89,8 +90,9 @@ class OptimizedBFInterpreter extends BFInterpreterBase {
         default:;
       }
       prog_ptr += 1;
+      cycle_count += 1;
     }
-    return Uint8Array.from(output_data);
+    return [Uint8Array.from(output_data), cycle_count];
   }
 }
 
@@ -120,6 +122,7 @@ class SimplBFDebbuger extends BFInterpreterBase {
     this._data = new Uint8Vector(1024);
     this._data_ptr = 0;
     this._prog_ptr = 0;
+    this._cycle_count = 0;
   }
   get data() {
     return this._data;
@@ -136,10 +139,14 @@ class SimplBFDebbuger extends BFInterpreterBase {
   get stderr_data() {
     return Uint8Array.from(this._stderr_data);
   }
+  get cycle_count() {
+    return this._cycle_count;
+  }
   run(input, interval) {
     this._data = new Uint8Vector(1024);
     this._data_ptr = 0;
     this._prog_ptr = 0;
+    this._cycle_count = 0;
     this.input = input;
     this.input_ptr = 0;
     this._stdout_data = [];
@@ -153,6 +160,7 @@ class SimplBFDebbuger extends BFInterpreterBase {
       const stderr = Uint8Array.from(this._stderr_data);
       postMessage({
         type: 'finished',
+        cycle_count: this._cycle_count,
         stdout: stdout,
         stderr: stderr
       });
@@ -162,6 +170,7 @@ class SimplBFDebbuger extends BFInterpreterBase {
       type: 'step',
       prog_ptr: this._prog_ptr,
       data_ptr: this._data_ptr,
+      cycle_count: this._cycle_count,
       data: this._data.toArray
     });
     switch (this._source[this.prog_ptr]) {
@@ -224,6 +233,7 @@ class SimplBFDebbuger extends BFInterpreterBase {
       default:;
     }
     this._prog_ptr += 1;
+    this._cycle_count += 1;
   }
   stop() {
     clearInterval(this.handle);
@@ -245,9 +255,10 @@ onmessage = function(e) {
       switch (e.data.mode) {
         case 'disable':
           let bfi = new OptimizedBFInterpreter(source, eof);
-          const result = bfi.run(input);
+          const [result, cycle_count] = bfi.run(input);
           postMessage({
             type:'finished',
+            cycle_count: cycle_count,
             stdout: result,
             stderr: new Uint8Array()
           });

@@ -51,6 +51,7 @@ let vm = new Vue({
     program_status: 'not_started',
     prog_ptr: 0,
     data_ptr: 0,
+    cycle_count: 0,
     memrange: {
       begin: 0,
       end: 16
@@ -115,11 +116,13 @@ let vm = new Vue({
             if (vm.debug_mode == 'disable') {
               vm.stdout_string = encodeWithMode(e.data.stdout, vm.stdout_mode, vm.stdout_decoder);
             }
+            vm.cycle_count = e.data.cycle_count;
             vm.program_status = 'not_started';
             break;
           case 'step':
             vm.prog_ptr = e.data.prog_ptr;
             vm.data_ptr = e.data.data_ptr;
+            vm.cycle_count = e.data.cycle_count;
             vm.data = e.data.data;
             break;
           case 'stdout':
